@@ -12,6 +12,7 @@ NNSTREAMER_INCLUDES := $(NNSTREAMER_DIR)/include
 NNSTREAMER_LIB_PATH := $(NNSTREAMER_DIR)/lib/$(TARGET_ARCH_ABI)
 
 ENABLE_SNAP := false
+ENABLE_NNFW := false
 
 #------------------------------------------------------
 # nnstreamer native
@@ -60,10 +61,57 @@ include $(PREBUILT_SHARED_LIBRARY)
 endif
 
 #------------------------------------------------------
+# NNFW prebuilt libraries (arm64-v8a only)
+#------------------------------------------------------
+ifeq ($(ENABLE_NNFW), true)
+NNFW_PREBUILT_LIBS :=
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libbackend_cpu
+LOCAL_MODULE := nnfw-libbackend_cpu
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libbackend_cpu.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libcircle_loader
+LOCAL_MODULE := nnfw-libcircle_loader
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libcircle_loader.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libneuralnetworks
+LOCAL_MODULE := nnfw-libneuralnetworks
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libneuralnetworks.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libneurun_core
+LOCAL_MODULE := nnfw-libneurun_core
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libneurun_core.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libnnfw-dev
+LOCAL_MODULE := nnfw-libnnfw-dev
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libnnfw-dev.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+NNFW_PREBUILT_LIBS += nnfw-libtflite_loader
+LOCAL_MODULE := nnfw-libtflite_loader
+LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libtflite_loader.so
+include $(PREBUILT_SHARED_LIBRARY)
+endif
+
+#------------------------------------------------------
 # define required libraries for nnstreamer
 #------------------------------------------------------
 NNSTREAMER_LIBS := nnstreamer-native gst-android cpp-shared
 
 ifeq ($(ENABLE_SNAP), true)
 NNSTREAMER_LIBS += snap-sdk
+endif
+
+ifeq ($(ENABLE_NNFW), true)
+NNSTREAMER_LIBS += $(NNFW_PREBUILT_LIBS)
 endif
