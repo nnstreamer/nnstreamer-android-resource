@@ -74,7 +74,7 @@ CORE_CC_EXCLUDE_SRCS := \
 # Filter out all the excluded files.
 TF_LITE_CC_SRCS := $(filter-out $(CORE_CC_EXCLUDE_SRCS), $(CORE_CC_ALL_SRCS))
 TF_LITE_INCLUDES := \
-    $(ANDROID_NDK_ROOT)/../ \
+    $(ANDROID_NDK_ROOT) \
     $(TENSORFLOW_ROOT) \
     $(DOWNLOADS_DIR)/ \
     $(DOWNLOADS_DIR)/eigen \
@@ -84,6 +84,7 @@ TF_LITE_INCLUDES := \
     $(DOWNLOADS_DIR)/farmhash/src \
     $(DOWNLOADS_DIR)/flatbuffers/include
 
+LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
 LOCAL_C_INCLUDES := $(TF_LITE_INCLUDES)
 
