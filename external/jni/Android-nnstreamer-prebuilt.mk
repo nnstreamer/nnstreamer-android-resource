@@ -19,16 +19,11 @@ ENABLE_SNPE := false
 #------------------------------------------------------
 # define required libraries for nnstreamer
 #------------------------------------------------------
-NNSTREAMER_LIBS := nnstreamer nnstreamer-native gst-android cpp-shared
+NNSTREAMER_LIBS := nnstreamer-native gst-android cpp-shared
 
 #------------------------------------------------------
-# nnstreamer
+# nnstreamer-native
 #------------------------------------------------------
-include $(CLEAR_VARS)
-LOCAL_MODULE := nnstreamer
-LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libnnstreamer.so
-include $(PREBUILT_SHARED_LIBRARY)
-
 include $(CLEAR_VARS)
 LOCAL_MODULE := nnstreamer-native
 LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libnnstreamer-native.so
@@ -51,30 +46,13 @@ LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libc++_shared.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 #------------------------------------------------------
-# tensorflow-lite
-#------------------------------------------------------
-ifeq ($(ENABLE_TF_LITE),true)
-include $(CLEAR_VARS)
-LOCAL_MODULE := tensorflow-lite-subplugin
-LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libtensorflow-lite-subplugin.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-NNSTREAMER_LIBS += tensorflow-lite-subplugin
-endif
-
-#------------------------------------------------------
 # SNAP (arm64-v8a only)
 #------------------------------------------------------
 ifeq ($(ENABLE_SNAP),true)
 SNAP_LIB_PATH := $(NNSTREAMER_LIB_PATH)
 include $(LOCAL_PATH)/Android-snap-prebuilt.mk
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := snap-subplugin
-LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libsnap-subplugin.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-NNSTREAMER_LIBS += $(SNAP_PREBUILT_LIBS) snap-subplugin
+NNSTREAMER_LIBS += $(SNAP_PREBUILT_LIBS)
 endif
 
 #------------------------------------------------------
@@ -84,12 +62,7 @@ ifeq ($(ENABLE_NNFW),true)
 NNFW_LIB_PATH := $(NNSTREAMER_LIB_PATH)
 include $(LOCAL_PATH)/Android-nnfw-prebuilt.mk
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := nnfw-subplugin
-LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libnnfw-subplugin.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-NNSTREAMER_LIBS += $(NNFW_PREBUILT_LIBS) nnfw-subplugin
+NNSTREAMER_LIBS += $(NNFW_PREBUILT_LIBS)
 endif
 
 #------------------------------------------------------
@@ -99,12 +72,7 @@ ifeq ($(ENABLE_SNPE),true)
 SNPE_LIB_PATH := $(NNSTREAMER_LIB_PATH)
 include $(LOCAL_PATH)/Android-snpe-prebuilt.mk
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := snpe-subplugin
-LOCAL_SRC_FILES := $(NNSTREAMER_LIB_PATH)/libsnpe-subplugin.so
-include $(PREBUILT_SHARED_LIBRARY)
-
-NNSTREAMER_LIBS += $(SNPE_PREBUILT_LIBS) snpe-subplugin
+NNSTREAMER_LIBS += $(SNPE_PREBUILT_LIBS)
 endif
 
 # Remove any duplicates.
