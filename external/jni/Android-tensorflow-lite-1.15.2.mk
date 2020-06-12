@@ -20,6 +20,19 @@ endif
 TF_LITE_DIR := $(TENSORFLOW_ROOT)/tensorflow/lite
 DOWNLOADS_DIR := $(TF_LITE_DIR)/tools/make/downloads
 
+# Set build flags
+TF_LITE_FLAGS := -O3 -DNDEBUG -fPIC
+# -funsafe-math-optimizations -ftree-vectorize
+# -Wno-sign-compare -Wno-format-security -Wno-format
+
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+# -march=armv7-a
+# TF_LITE_FLAGS += -mfpu=neon
+else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+# -march=armv8-a
+# TF_LITE_FLAGS += -march=armv8.2a+dotprod
+endif
+
 # Set files to compile (TODO check Makefile to build tensorflow-lite)
 CORE_CC_ALL_SRCS := \
     $(wildcard $(TF_LITE_DIR)/*.cc) \
@@ -88,10 +101,10 @@ LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
 LOCAL_C_INCLUDES := $(TF_LITE_INCLUDES)
 
-LOCAL_CFLAGS += -O2 -DNDEBUG -fPIC
+LOCAL_CFLAGS := $(TF_LITE_FLAGS)
 # std for toolchain in NDK
 # rtti for typecast in tensorflow-lite
 # exceptions to enable exception handling in tensorflow-lite
-LOCAL_CXXFLAGS += -std=c++11 -frtti -fexceptions -O2 -DNDEBUG -fPIC
+LOCAL_CXXFLAGS := -std=c++11 -frtti -fexceptions $(TF_LITE_FLAGS)
 
 include $(BUILD_STATIC_LIBRARY)
