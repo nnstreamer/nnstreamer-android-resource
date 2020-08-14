@@ -21,17 +21,7 @@ TF_LITE_DIR := $(TENSORFLOW_ROOT)/tensorflow/lite
 DOWNLOADS_DIR := $(TF_LITE_DIR)/tools/make/downloads
 
 # Set build flags
-TF_LITE_FLAGS := -O3 -DNDEBUG -fPIC
-# -funsafe-math-optimizations -ftree-vectorize
-# -Wno-sign-compare -Wno-format-security -Wno-format
-
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-# -march=armv7-a
-# TF_LITE_FLAGS += -mfpu=neon
-else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-# -march=armv8-a
-# TF_LITE_FLAGS += -march=armv8.2a+dotprod
-endif
+TF_LITE_FLAGS := -O3 -fPIC -DNDEBUG
 
 # Set files to compile (TODO check Makefile to build tensorflow-lite)
 CORE_CC_ALL_SRCS := \
@@ -59,7 +49,6 @@ CORE_CC_ALL_SRCS := \
     $(wildcard $(TF_LITE_DIR)/kernels/internal/*.cc) \
     $(wildcard $(TF_LITE_DIR)/kernels/internal/optimized/*.cc) \
     $(wildcard $(TF_LITE_DIR)/kernels/internal/reference/*.cc) \
-    $(TF_LITE_DIR)/profiling/time.cc \
     $(DOWNLOADS_DIR)/farmhash/src/farmhash.cc \
     $(DOWNLOADS_DIR)/fft2d/fftsg.c \
     $(DOWNLOADS_DIR)/flatbuffers/src/util.cpp
@@ -72,15 +61,34 @@ CORE_CC_ALL_SRCS += \
 
 # Remove any duplicates.
 CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
+
 CORE_CC_EXCLUDE_SRCS := \
     $(wildcard $(TF_LITE_DIR)/*test.cc) \
     $(wildcard $(TF_LITE_DIR)/*/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/benchmark.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/example*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/test*.cc) \
     $(wildcard $(TF_LITE_DIR)/*/*/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*tool.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/benchmark.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/example*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/test*.cc) \
     $(wildcard $(TF_LITE_DIR)/*/*/*/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*tool.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/benchmark.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/example*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/test*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*tool.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*/benchmark.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*/example*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*/test*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*/*/*/*/*tool.cc) \
     $(wildcard $(TF_LITE_DIR)/kernels/*test_main.cc) \
-    $(wildcard $(TF_LITE_DIR)/kernels/*test_util.cc) \
+    $(wildcard $(TF_LITE_DIR)/kernels/*test_util*.cc) \
     $(TF_LITE_DIR)/examples/minimal/minimal.cc \
-    $(TF_LITE_DIR)/mmap_allocation.cc \
+    $(TF_LITE_DIR)/mmap_allocation_disabled.cc \
     $(TF_LITE_DIR)/minimal_logging_default.cc \
     $(TF_LITE_DIR)/minimal_logging_ios.cc
 
@@ -100,11 +108,7 @@ TF_LITE_INCLUDES := \
 LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
 LOCAL_C_INCLUDES := $(TF_LITE_INCLUDES)
-
 LOCAL_CFLAGS := $(TF_LITE_FLAGS)
-# std for toolchain in NDK
-# rtti for typecast in tensorflow-lite
-# exceptions to enable exception handling in tensorflow-lite
 LOCAL_CXXFLAGS := -std=c++11 -frtti -fexceptions $(TF_LITE_FLAGS)
 
 include $(BUILD_STATIC_LIBRARY)
