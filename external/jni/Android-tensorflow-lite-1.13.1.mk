@@ -41,6 +41,10 @@ CORE_CC_ALL_SRCS := \
     $(DOWNLOADS_DIR)/farmhash/src/farmhash.cc \
     $(DOWNLOADS_DIR)/fft2d/fftsg.c
 
+# NNAPI
+CORE_CC_ALL_SRCS += \
+    $(TF_LITE_DIR)/delegates/nnapi/nnapi_delegate.cc
+
 # Remove any duplicates.
 CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
 
