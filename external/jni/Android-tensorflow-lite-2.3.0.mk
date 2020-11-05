@@ -45,14 +45,35 @@ CORE_CC_ALL_SRCS := \
 
 CORE_CC_ALL_SRCS += \
     $(shell find $(DOWNLOADS_DIR)/absl/absl/ \
-        -type f -name \*.cc | grep -v test | grep -v benchmark | grep -v synchronization | grep -v debugging | grep -v hash | grep -v flags | grep -v random)
+        -type f -name \*.cc | grep -v test | grep -v benchmark | grep -v flags | grep -v random | grep -v mutex_nonprod)
 
-# NNAPI
+# NNAPI delegate
 CORE_CC_ALL_SRCS += \
     $(TF_LITE_DIR)/delegates/nnapi/nnapi_delegate.cc \
     $(TF_LITE_DIR)/delegates/nnapi/quant_lstm_sup.cc \
     $(TF_LITE_DIR)/nnapi/nnapi_implementation.cc \
-    $(TF_LITE_DIR)/nnapi/nnapi_util.cc
+    $(TF_LITE_DIR)/nnapi/nnapi_util.cc \
+    $(TF_LITE_DIR)/delegates/utils.cc
+    # $(TF_LITE_DIR)/nnapi/nnapi_handler.cc
+
+# GPU delegate
+CORE_CC_ALL_SRCS += \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/cl/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/cl/kernels/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/cl/selectors/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/cl/selectors/default/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/common/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/common/default/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/common/memory_management/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/common/transformations/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/gl/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/gl/compiler/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/gl/converters/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/gl/kernels/*.cc) \
+    $(wildcard $(TF_LITE_DIR)/delegates/gpu/gl/workgroups/*.cc)
+
+TF_LITE_FLAGS += -DEGL_EGLEXT_PROTOTYPES -DCL_TARGET_OPENCL_VERSION=220
 
 # Remove any duplicates.
 CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
@@ -102,12 +123,13 @@ TF_LITE_INCLUDES := \
     $(DOWNLOADS_DIR)/neon_2_sse \
     $(DOWNLOADS_DIR)/farmhash/src \
     $(DOWNLOADS_DIR)/flatbuffers/include \
-    $(DOWNLOADS_DIR)/fp16/include
+    $(DOWNLOADS_DIR)/fp16/include \
+    $(DOWNLOADS_DIR)/opencl # Should download opencl_header
 
 LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
 LOCAL_C_INCLUDES := $(TF_LITE_INCLUDES)
 LOCAL_CFLAGS := $(TF_LITE_FLAGS)
-LOCAL_CXXFLAGS := -std=c++11 -frtti -fexceptions $(TF_LITE_FLAGS)
+LOCAL_CXXFLAGS := -std=c++14 -frtti -fexceptions $(TF_LITE_FLAGS)
 
 include $(BUILD_STATIC_LIBRARY)
