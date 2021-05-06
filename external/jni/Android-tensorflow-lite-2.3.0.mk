@@ -47,16 +47,30 @@ CORE_CC_ALL_SRCS += \
     $(shell find $(DOWNLOADS_DIR)/absl/absl/ \
         -type f -name \*.cc | grep -v test | grep -v benchmark | grep -v flags | grep -v random | grep -v mutex_nonprod)
 
+# Delegates
+CORE_CC_ALL_SRCS += \
+    $(TF_LITE_DIR)/delegates/utils.cc \
+    $(TF_LITE_DIR)/delegates/interpreter_utils.cc
+
 # NNAPI delegate
 CORE_CC_ALL_SRCS += \
     $(TF_LITE_DIR)/delegates/nnapi/nnapi_delegate.cc \
     $(TF_LITE_DIR)/delegates/nnapi/quant_lstm_sup.cc \
     $(TF_LITE_DIR)/nnapi/nnapi_implementation.cc \
-    $(TF_LITE_DIR)/nnapi/nnapi_util.cc \
-    $(TF_LITE_DIR)/delegates/utils.cc
-    # $(TF_LITE_DIR)/nnapi/nnapi_handler.cc
+    $(TF_LITE_DIR)/nnapi/nnapi_util.cc
 
 # GPU delegate
+# Generate required flatbuffers headers (Should be flatc version 1.12.0).
+GPU_CL_DIR := $(TF_LITE_DIR)/delegates/gpu/cl
+$(flatc --scoped-enums -c -o $(GPU_CL_DIR) $(GPU_CL_DIR)/compiled_program_cache.fbs)
+$(flatc --scoped-enums -c -o $(GPU_CL_DIR) $(GPU_CL_DIR)/serialization.fbs)
+
+GPU_GL_DIR := $(TF_LITE_DIR)/delegates/gpu/gl
+$(flatc --scoped-enums -c -o $(GPU_GL_DIR) $(GPU_GL_DIR)/compiled_model.fbs)
+$(flatc -c -o $(GPU_GL_DIR) $(GPU_GL_DIR)/common.fbs)
+$(flatc -c -o $(GPU_GL_DIR) $(GPU_GL_DIR)/metadata.fbs)
+$(flatc -c -o $(GPU_GL_DIR) $(GPU_GL_DIR)/workgroups.fbs)
+
 CORE_CC_ALL_SRCS += \
     $(wildcard $(TF_LITE_DIR)/delegates/gpu/*.cc) \
     $(wildcard $(TF_LITE_DIR)/delegates/gpu/cl/*.cc) \
@@ -80,6 +94,8 @@ CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
 
 CORE_CC_EXCLUDE_SRCS := \
     $(wildcard $(TF_LITE_DIR)/*test.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/test*.cc) \
+    $(wildcard $(TF_LITE_DIR)/*/*test.c) \
     $(wildcard $(TF_LITE_DIR)/*/*test.cc) \
     $(wildcard $(TF_LITE_DIR)/*/*/benchmark.cc) \
     $(wildcard $(TF_LITE_DIR)/*/*/example*.cc) \
@@ -123,13 +139,18 @@ TF_LITE_INCLUDES := \
     $(DOWNLOADS_DIR)/neon_2_sse \
     $(DOWNLOADS_DIR)/farmhash/src \
     $(DOWNLOADS_DIR)/flatbuffers/include \
-    $(DOWNLOADS_DIR)/fp16/include \
-    $(DOWNLOADS_DIR)/opencl # Should download opencl_header
+    $(DOWNLOADS_DIR)/fp16/include
+
+# Include external headers (e.g., GPU or XNNPACK delegates).
+# TODO You should set below path for external headers.
+# GPU delegate
+TF_LITE_INCLUDES += \
+    <path to OpenCL headers>
 
 LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
 LOCAL_C_INCLUDES := $(TF_LITE_INCLUDES)
 LOCAL_CFLAGS := $(TF_LITE_FLAGS)
-LOCAL_CXXFLAGS := -std=c++14 -frtti -fexceptions $(TF_LITE_FLAGS)
+LOCAL_CXXFLAGS := -frtti -fexceptions $(TF_LITE_FLAGS)
 
 include $(BUILD_STATIC_LIBRARY)
