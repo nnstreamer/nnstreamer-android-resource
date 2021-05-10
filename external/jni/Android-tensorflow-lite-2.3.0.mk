@@ -21,7 +21,7 @@ TF_LITE_DIR := $(TENSORFLOW_ROOT)/tensorflow/lite
 DOWNLOADS_DIR := $(TF_LITE_DIR)/tools/make/downloads
 
 # Set build flags
-TF_LITE_FLAGS := -O3 -fPIC -DNDEBUG -DTFLITE_WITH_RUY -DTFLITE_WITHOUT_XNNPACK
+TF_LITE_FLAGS := -O3 -fPIC -DNDEBUG -DTFLITE_WITH_RUY
 
 # Set files to compile (TODO check Makefile to build tensorflow-lite)
 CORE_CC_ALL_SRCS := \
@@ -51,6 +51,10 @@ CORE_CC_ALL_SRCS += \
 CORE_CC_ALL_SRCS += \
     $(TF_LITE_DIR)/delegates/utils.cc \
     $(TF_LITE_DIR)/delegates/interpreter_utils.cc
+
+# XNNPACK delegate
+CORE_CC_ALL_SRCS += \
+    $(TF_LITE_DIR)/delegates/xnnpack/xnnpack_delegate.cc
 
 # NNAPI delegate
 CORE_CC_ALL_SRCS += \
@@ -146,6 +150,11 @@ TF_LITE_INCLUDES := \
 # GPU delegate
 TF_LITE_INCLUDES += \
     <path to OpenCL headers>
+
+# XNNPACK delegate
+TF_LITE_INCLUDES += \
+    <path to XNNPACK headers> \
+    <path to pthreadpool headers>
 
 LOCAL_ARM_NEON := true
 LOCAL_SRC_FILES := $(TF_LITE_CC_SRCS)
