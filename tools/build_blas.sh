@@ -11,7 +11,7 @@
 # usage: ./build_blas.sh src_root ndk_root <install_path>
 # if install path is not given, it is installed in $(pwd)
 # src should be prepared before running this script
-# this script is competible with https://github.com/xianyi/OpenBLAS/tree/v0.2.20
+# this script is competible with https://github.com/xianyi/OpenBLAS/tree/v0.3.18 or v0.2.20
 # not gauranteed to work for other versions
 
 function _verify_dir {
