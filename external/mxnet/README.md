@@ -3,7 +3,7 @@
 ```bash
 cat mxnet-1.9.1.tar.xz_* > mxnet-1.9.1.tar.xz
 tar -xJf mxnet-1.9.1.tar.xz
-mv mxnet/ ${ANDROID_JNI_DIR}
+mv mxnet/ $ANDROID_JNI_DIR
 ```
 
 # How to build MXNET shared library
@@ -11,10 +11,12 @@ mv mxnet/ ${ANDROID_JNI_DIR}
 First of all, clone incubator-mxnet github repositoy as following:
 ```bash
 git clone https://github.com/apache/incubator-mxnet.git
-git checkout ${TARGET_VERSION}
+git checkout $TARGET_VERSION
 ```
 
 And then, you can build mxnet shared library using NDK by running ci scripts.
+Since the `cpp-package/op.h` file is created locally when installed, you must run `make install` manually.
+
 ```bash
 sudo python3 ci/build.py -p android_armv8
 sed -i "s|USE_CPP_PACKAGE OFF|USE_CPP_PACKAGE ON" config/linux.cmake
